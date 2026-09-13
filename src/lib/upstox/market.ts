@@ -25,6 +25,13 @@ export function getIstNowParts(date = new Date()) {
 export function getMarketSession(now = new Date()): MarketSession {
   const { time } = getIstNowParts(now);
 
+  // NSE equity/F&O is closed on Saturday and Sunday.
+  const weekday = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kolkata",
+    weekday: "short",
+  }).format(now);
+
+  if (weekday === "Sat" || weekday === "Sun") return "CLOSED";
   if (time < OPEN_TIME) return "PRE_MARKET";
   if (time >= OPEN_TIME && time <= `${CLOSE_TIME}:59`) return "OPEN";
   return "CLOSED";
