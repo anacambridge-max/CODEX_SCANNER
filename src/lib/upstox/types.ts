@@ -8,7 +8,7 @@ export interface UpstoxSessionStatus {
   connected: boolean;
   expired: boolean;
   expiresAt: string | null;
-  source: "SUPABASE" | "LOCAL_FILE" | "NONE";
+  source: "ANALYTICS_ENV" | "SUPABASE" | "LOCAL_FILE" | "NONE";
   message: string;
 }
 
