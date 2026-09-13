@@ -21,7 +21,7 @@ export async function getUpstoxSessionStatus(): Promise<UpstoxSessionStatus> {
     connected: Boolean(token),
     expired: false,
     expiresAt: null,
-    source: token ? "SUPABASE" : "NONE",
+    source: token ? "ANALYTICS_ENV" : "NONE",
     message: token ? "Upstox Analytics Token is configured." : "UPSTOX_ANALYTICS_TOKEN is not configured.",
   };
 }
