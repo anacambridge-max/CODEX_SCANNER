@@ -1,6 +1,6 @@
 import type { UpstoxHistoricalCandle } from "@/lib/upstox/types";
 
-const BASE_URL = "https://api-v2.upstox.com";
+const BASE_URL = "https://api.upstox.com";
 
 function authHeader(accessToken: string) {
   return {
@@ -16,7 +16,8 @@ async function upstoxGet<T>(path: string, accessToken: string): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(`Upstox request failed (${response.status}) for ${path}`);
+    const body = await response.text().catch(() => "");
+    throw new Error(`Upstox request failed (${response.status}) for ${path}: ${body.slice(0, 300)}`);
   }
 
   return (await response.json()) as T;
@@ -42,7 +43,9 @@ export async function fetchHistorical1MinCandles(
   toDate: string,
   fromDate: string,
 ): Promise<UpstoxHistoricalCandle[]> {
-  const path = `/v2/historical-candle/${encodeURIComponent(instrumentKey)}/1minute/${toDate}/${fromDate}`;
+  // Upstox V3 is the current historical-candle API and explicitly supports
+  // 1-minute candles. A seven-day window is within its supported range.
+  const path = `/v3/historical-candle/${encodeURIComponent(instrumentKey)}/minutes/1/${toDate}/${fromDate}`;
 
   const json = await upstoxGet<{ data?: { candles?: (string | number)[][] } }>(path, accessToken);
   const candles = json.data?.candles ?? [];
