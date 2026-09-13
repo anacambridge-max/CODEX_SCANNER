@@ -1,4 +1,4 @@
-import { fetchHistorical5MinCandles } from "@/lib/upstox/client";
+import { fetchHistorical1MinCandles } from "@/lib/upstox/client";
 import { getUpstoxSessionStatus, loadUpstoxToken } from "@/lib/upstox/token-store";
 
 export const dynamic = "force-dynamic";
@@ -30,12 +30,12 @@ export async function GET(request: Request) {
   }
 
   try {
-    const candles = await fetchHistorical5MinCandles(token.accessToken, instrumentKey, toDate, fromDate);
+    const candles = await fetchHistorical1MinCandles(token.accessToken, instrumentKey, toDate, fromDate);
 
     return Response.json({
       ok: true,
       instrumentKey,
-      interval: "5minute",
+      interval: "1minute",
       fromDate,
       toDate,
       count: candles.length,
