@@ -1,18 +1,24 @@
 import type { PrimeScanSummary } from "@/domain/prime";
 import { runPrimeScanner } from "@/engine/prime/scanner";
-import { fetchHistorical5MinCandles, fetchLtp } from "@/lib/upstox/client";
+import { fetchHistorical1MinCandles, fetchLtp } from "@/lib/upstox/client";
 import { getMarketSession, getRefreshMeta } from "@/lib/upstox/market";
 import { getUpstoxSessionStatus, loadUpstoxToken } from "@/lib/upstox/token-store";
-import { loadConfiguredUniverse } from "@/lib/upstox/universe";
+import { loadConfiguredUniverse, loadLiveFnoUniverse } from "@/lib/upstox/universe";
 
 const DEFAULT_SCAN_LIMIT = 60;
 
 export async function buildPrimeScanSummary(): Promise<PrimeScanSummary> {
   const generatedAt = new Date().toISOString();
   const session = await getUpstoxSessionStatus();
-  const universe = loadConfiguredUniverse();
   const marketStatus = getMarketSession(new Date());
   const refreshMeta = getRefreshMeta(generatedAt);
+
+  let universe;
+  try {
+    universe = await loadLiveFnoUniverse();
+  } catch {
+    universe = loadConfiguredUniverse();
+  }
 
   if (!session.connected) {
     return {
@@ -57,7 +63,7 @@ export async function buildPrimeScanSummary(): Promise<PrimeScanSummary> {
     selected.map(async (item) => {
       try {
         const [candles, ltp] = await Promise.all([
-          fetchHistorical5MinCandles(token.accessToken, item.instrumentKey, toDate, fromDate),
+          fetchHistorical1MinCandles(token.accessToken, item.instrumentKey, toDate, fromDate),
           fetchLtp(token.accessToken, item.instrumentKey),
         ]);
 
