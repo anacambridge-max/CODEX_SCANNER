@@ -36,13 +36,13 @@ export async function fetchLtp(accessToken: string, instrumentKey: string): Prom
   return typeof value === "number" ? value : null;
 }
 
-export async function fetchHistorical5MinCandles(
+export async function fetchHistorical1MinCandles(
   accessToken: string,
   instrumentKey: string,
   toDate: string,
   fromDate: string,
 ): Promise<UpstoxHistoricalCandle[]> {
-  const path = `/v2/historical-candle/${encodeURIComponent(instrumentKey)}/5minute/${toDate}/${fromDate}`;
+  const path = `/v2/historical-candle/${encodeURIComponent(instrumentKey)}/1minute/${toDate}/${fromDate}`;
 
   const json = await upstoxGet<{ data?: { candles?: (string | number)[][] } }>(path, accessToken);
   const candles = json.data?.candles ?? [];
@@ -67,3 +67,5 @@ export async function fetchHistorical5MinCandles(
     .filter((c): c is UpstoxHistoricalCandle => Boolean(c))
     .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 }
+
+export const fetchHistorical5MinCandles = fetchHistorical1MinCandles;
